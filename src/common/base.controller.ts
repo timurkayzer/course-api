@@ -3,16 +3,22 @@ import { Router } from 'express';
 import { Route } from "./route.interface";
 
 export abstract class BaseController {
+    private _baseRoute: string;
     private logger: LoggerService
     private readonly _router: Router;
 
-    constructor(logger: LoggerService, router: Router) {
+    constructor(logger: LoggerService, router: Router, route: string) {
         this.logger = logger;
         this._router = router;
+        this._baseRoute = route;
     }
 
     get router() {
         return this._router;
+    }
+
+    get baseRoute() {
+        return this._baseRoute;
     }
 
     protected bindRoutes(routes: Route[]) {
