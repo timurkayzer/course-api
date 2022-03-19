@@ -1,11 +1,18 @@
 import { NextFunction, Request, Response, Router } from "express";
+import { inject, injectable } from "inversify";
 import { BaseController } from "../common/base.controller";
 import { HttpError } from "../errors/http-error";
-import { LoggerService } from "../logger/logger.service";
+import { ILogger } from "../logger/logger.interface";
+import { TYPES } from "../types";
+import 'reflect-metadata';
+import { IUserController } from "./users.controller.interface";
 
-export class UserController extends BaseController {
-    constructor(loggerService: LoggerService) {
-        super(loggerService, Router(), '/users');
+
+@injectable()
+export class UserController extends BaseController implements IUserController {
+    constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
+        super(loggerService);
+        this.baseRoute = '/users';
         this.bindRoutes([
             {
                 path: '/register',
@@ -20,13 +27,13 @@ export class UserController extends BaseController {
         ]);
     }
 
-    private login(req: Request, res: Response, next: NextFunction) {
+    login(req: Request, res: Response, next: NextFunction) {
 
         //res.send('Logged in');
         throw new Error('Непредвиденная ошибка');
     }
 
-    private register(req: Request, res: Response, next: NextFunction) {
+    register(req: Request, res: Response, next: NextFunction) {
         throw new HttpError(500, 'Непредвиденная ошибка', 'Контроллер');
 
         //res.send('Registered');

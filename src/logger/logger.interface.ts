@@ -1,4 +1,6 @@
 import { Logger } from 'tslog';
+import 'reflect-metadata';
+
 
 export interface ILogger {
     logger: Logger;

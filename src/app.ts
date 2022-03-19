@@ -1,23 +1,24 @@
 import express, { Express, Router } from 'express';
-import { Server } from 'http';
+import { inject, injectable } from 'inversify';
 import { BaseController } from './common/base.controller';
 import { IExceptionFilter } from './errors/exception.filter.interface';
 import { ILogger } from './logger/logger.interface';
-import { LoggerService } from './logger/logger.service';
+import { TYPES } from './types';
+import { UserController } from './users/users.controller';
+import 'reflect-metadata';
+import { IUserController } from './users/users.controller.interface';
 
+@injectable()
 export class App {
     private app: Express;
-    private port: number;
-    private server: Server;
-    private controllers: BaseController[];
-    private exceptionFilter: IExceptionFilter;
-    logger: ILogger;
+    private port = 4200;
 
-    constructor(port: number, logger: ILogger, controllers: BaseController[], exceptionFilter: IExceptionFilter) {
+    constructor(
+        @inject(TYPES.ILogger) private logger: ILogger,
+        @inject(TYPES.IUserController) private userController: IUserController,
+        @inject(TYPES.ExceptionFilter) private exceptionFilter: IExceptionFilter) {
         this.app = express();
-        this.port = port;
         this.logger = logger;
-        this.controllers = controllers;
         this.exceptionFilter = exceptionFilter;
     }
 
@@ -30,11 +31,9 @@ export class App {
     }
 
     public async init() {
-        this.server = this.app.listen(this.port);
-        this.controllers.forEach(controller => {
-            this.useRoute(controller.baseRoute, controller.router);
-        });
+        this.useRoute(this.userController.baseRoute, this.userController.router);
         this.useExceptionFilters();
         this.logger.log('Сервер запущен на порту ' + this.port);
+        this.app.listen(this.port);
     }
 }

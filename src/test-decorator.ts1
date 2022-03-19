@@ -1,0 +1,20 @@
+function Component(id: number) {
+    return (target: Function) => {
+        target.prototype.id = id;
+    };
+}
+
+function Logger() {
+
+}
+
+
+@Component(1)
+export class User {
+    id: number;
+
+    updateId(newId: number): number {
+        this.id = newId;
+        return this.id;
+    }
+}
