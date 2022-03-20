@@ -27,7 +27,6 @@ export class UserController extends BaseController implements IUserController {
 	}
 
 	login(req: Request, res: Response, next: NextFunction): Promise<void> {
-		//res.send('Logged in');
 		throw new Error('Непредвиденная ошибка');
 	}
 
