@@ -8,11 +8,14 @@ import { TYPES } from './types';
 import { UserController } from './users/users.controller';
 import 'reflect-metadata';
 import { IUserController } from './users/users.controller.interface';
+import { IUserService } from './users/users.service.interface';
+import { UserService } from './users/users.serivce';
 
 export const appBindings = new ContainerModule((bind: interfaces.Bind) => {
 	bind<ILogger>(TYPES.ILogger).to(LoggerService);
 	bind<IExceptionFilter>(TYPES.ExceptionFilter).to(ExceptionFilter);
 	bind<IUserController>(TYPES.IUserController).to(UserController);
+	bind<IUserService>(TYPES.IUserService).to(UserService);
 	bind<App>(TYPES.Application).to(App);
 });
 

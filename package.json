@@ -8,6 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "node dist/index.js",
+    "dev:inspect": "nodemon -e ts,json --exec node --inspect=localhost:9229 -r ts-node/register src/index.ts",
+    "dev:analysis": "clinic doctor --on-port 'autocannon -m POST localhost:4200/users/register' -- node dist/index.js",
     "lint": "eslint ./src/** --fix",
     "dev": "nodemon"
   },
@@ -15,12 +17,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.2",
     "express": "^4.17.3",
     "inversify": "^6.0.1",
     "reflect-metadata": "^0.1.13",
     "tslog": "^3.3.2"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.13",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
