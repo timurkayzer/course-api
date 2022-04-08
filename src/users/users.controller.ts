@@ -11,6 +11,7 @@ import { User } from './user.entity';
 import { IUserService } from './users.service.interface';
 import { HttpError } from '../errors/http-error';
 import { ValidateMiddleware } from '../common/validate.middleware';
+import { IConfigService } from '../config/config.service.interface';
 
 @injectable()
 export class UserController extends BaseController implements IUserController {
@@ -52,10 +53,10 @@ export class UserController extends BaseController implements IUserController {
 	): Promise<void> {
 		//throw new HttpError(500, 'Непредвиденная ошибка', 'Контроллер');
 		const user = await this.userService.createUser(body);
-		if (user) {
+		/*if (user) {
 			this.ok(res, user);
 		} else {
 			next(new HttpError(422, 'Пользователь уже зарегистрирован', 'user-register'));
-		}
+		}*/
 	}
 }
