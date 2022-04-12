@@ -53,6 +53,7 @@ export class UserController extends BaseController implements IUserController {
 	): Promise<void> {
 		//throw new HttpError(500, 'Непредвиденная ошибка', 'Контроллер');
 		const user = await this.userService.createUser(body);
+		this.ok(res, user);
 		/*if (user) {
 			this.ok(res, user);
 		} else {
