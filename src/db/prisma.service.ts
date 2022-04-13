@@ -5,9 +5,9 @@ import { TYPES } from '../types';
 
 @injectable()
 export class PrismaService {
-	private client: PrismaClient;
+	public client: PrismaClient;
 
-	constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
+	constructor(@inject(TYPES.Logger) private loggerService: ILogger) {
 		this.client = new PrismaClient();
 	}
 

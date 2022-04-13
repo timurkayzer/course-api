@@ -5,20 +5,37 @@ import { UserLoginDto } from './dto/user-login.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
 import { User } from './user.entity';
 import { IUserService } from './users.service.interface';
-import 'reflect-metadata';
+import { IUsersRepository } from './users.repository.interface';
+import { UserModel } from '@prisma/client';
 
 @injectable()
 export class UserService implements IUserService {
-	constructor(@inject(TYPES.IConfigService) private configService: IConfigService) {}
+	constructor(
+		@inject(TYPES.ConfigService) private configService: IConfigService,
+		@inject(TYPES.UsersRepository) private usersRepository: IUsersRepository,
+	) {}
 
-	async createUser(dto: UserRegisterDto): Promise<User | null> {
-		const user = new User(dto.email, dto.name);
-		const salt = this.configService.get<number>('PASSWORD_SALT');
-		await user.setPassword(dto.password, Number(salt));
-		return user;
+	async createUser(dto: UserRegisterDto): Promise<UserModel | null> {
+		const existedUser = await this.usersRepository.find(dto.email);
+
+		if (existedUser) {
+			return null;
+		} else {
+			const user = new User(dto.email, dto.name);
+			const salt = this.configService.get<number>('PASSWORD_SALT');
+			await user.setPassword(dto.password, Number(salt));
+			return await this.usersRepository.create(user);
+		}
 	}
 
-	async validateUser(dto: UserLoginDto): Promise<boolean> {
+	async validateUser({ email, password }: UserLoginDto): Promise<boolean> {
+		const userModel = await this.usersRepository.find(email);
+
+		if (userModel) {
+			const user = new User(userModel.email, userModel.name, userModel.password);
+			return await user.checkPassword(password);
+		}
+
 		return false;
 	}
 }

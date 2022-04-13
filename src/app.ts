@@ -15,8 +15,8 @@ export class App {
 	private port = 4200;
 
 	constructor(
-		@inject(TYPES.ILogger) private logger: ILogger,
-		@inject(TYPES.IUserController) private userController: IUserController,
+		@inject(TYPES.Logger) private logger: ILogger,
+		@inject(TYPES.UserController) private userController: IUserController,
 		@inject(TYPES.ExceptionFilter) private exceptionFilter: IExceptionFilter,
 		@inject(TYPES.PrismaService) private prismaService: PrismaService,
 	) {

@@ -9,7 +9,7 @@ import { ILogger } from '../logger/logger.interface';
 export class ConfigService implements IConfigService {
 	private config: DotenvParseOutput;
 
-	constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
+	constructor(@inject(TYPES.Logger) private loggerService: ILogger) {
 		const result: DotenvConfigOutput = config();
 		if (result.error && !result.parsed) {
 			this.loggerService.error('Не удалось прочитать файл');

@@ -1,4 +1,3 @@
-import { LoggerService } from '../logger/logger.service';
 import { Response, Router } from 'express';
 import { Route } from './route.interface';
 import { injectable } from 'inversify';
@@ -37,6 +36,13 @@ export abstract class BaseController {
 	}
 
 	protected ok(res: Response, data: unknown, status = 200): void {
+		if (status) {
+			res.status(status);
+		}
+		res.send(data);
+	}
+
+	protected fail(res: Response, data: unknown, status = 400): void {
 		if (status) {
 			res.status(status);
 		}

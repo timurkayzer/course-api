@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { BaseController } from '../common/base.controller';
 import { ILogger } from '../logger/logger.interface';
@@ -7,17 +7,15 @@ import 'reflect-metadata';
 import { IUserController } from './users.controller.interface';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserRegisterDto } from './dto/user-register.dto';
-import { User } from './user.entity';
 import { IUserService } from './users.service.interface';
 import { HttpError } from '../errors/http-error';
 import { ValidateMiddleware } from '../common/validate.middleware';
-import { IConfigService } from '../config/config.service.interface';
 
 @injectable()
 export class UserController extends BaseController implements IUserController {
 	constructor(
-		@inject(TYPES.ILogger) private loggerService: ILogger,
-		@inject(TYPES.IUserService) private userService: IUserService,
+		@inject(TYPES.Logger) private loggerService: ILogger,
+		@inject(TYPES.UserService) private userService: IUserService,
 	) {
 		super(loggerService);
 		this.baseRoute = '/users';
@@ -32,18 +30,22 @@ export class UserController extends BaseController implements IUserController {
 				path: '/login',
 				method: 'post',
 				func: this.login,
+				middlewares: [new ValidateMiddleware(UserLoginDto)],
 			},
 		]);
 	}
 
 	async login(
-		req: Request<{}, {}, UserLoginDto>,
+		{ body }: Request<{}, {}, UserLoginDto>,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
-		this.loggerService.log(req.body);
-		res.send('Logged in');
-		// throw new Error('Непредвиденная ошибка');
+		const userIsValid = await this.userService.validateUser(body);
+		if (userIsValid) {
+			this.ok(res, body);
+		} else {
+			next(new HttpError(401, 'Пользователь не найден', 'user-login'));
+		}
 	}
 
 	async register(
@@ -51,13 +53,11 @@ export class UserController extends BaseController implements IUserController {
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
-		//throw new HttpError(500, 'Непредвиденная ошибка', 'Контроллер');
 		const user = await this.userService.createUser(body);
-		this.ok(res, user);
-		/*if (user) {
-			this.ok(res, user);
+		if (user) {
+			this.ok(res, { email: user?.email, id: user?.id });
 		} else {
 			next(new HttpError(422, 'Пользователь уже зарегистрирован', 'user-register'));
-		}*/
+		}
 	}
 }
