@@ -42,7 +42,8 @@ export class UserController extends BaseController implements IUserController {
 	): Promise<void> {
 		const userIsValid = await this.userService.validateUser(body);
 		if (userIsValid) {
-			this.ok(res, body);
+			const token = await this.userService.signToken(body.email);
+			this.ok(res, { ...body, token });
 		} else {
 			next(new HttpError(401, 'Пользователь не найден', 'user-login'));
 		}

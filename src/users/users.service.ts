@@ -7,6 +7,7 @@ import { User } from './user.entity';
 import { IUserService } from './users.service.interface';
 import { IUsersRepository } from './users.repository.interface';
 import { UserModel } from '@prisma/client';
+import { sign } from 'jsonwebtoken';
 
 @injectable()
 export class UserService implements IUserService {
@@ -37,5 +38,31 @@ export class UserService implements IUserService {
 		}
 
 		return false;
+	}
+
+	async signToken(email: string): Promise<string | null> {
+		const secret = this.configService.get<string>('JWT_SECRET');
+		return new Promise<string | null>((resolve, reject) => {
+			sign(
+				{
+					email,
+					iat: Math.floor(Date.now() / 1000),
+				},
+				secret,
+				{
+					algorithm: 'HS256',
+				},
+				(error, token) => {
+					if (error) {
+						reject(error);
+					}
+					if (token) {
+						resolve(token);
+					} else {
+						resolve(null);
+					}
+				},
+			);
+		});
 	}
 }
