@@ -10,6 +10,7 @@ import { UserRegisterDto } from './dto/user-register.dto';
 import { IUserService } from './users.service.interface';
 import { HttpError } from '../errors/http-error';
 import { ValidateMiddleware } from '../common/validate.middleware';
+import { AuthMiddleware } from '../common/auth.middleware';
 
 @injectable()
 export class UserController extends BaseController implements IUserController {
@@ -31,6 +32,12 @@ export class UserController extends BaseController implements IUserController {
 				method: 'post',
 				func: this.login,
 				middlewares: [new ValidateMiddleware(UserLoginDto)],
+			},
+			{
+				path: '/info',
+				method: 'get',
+				func: this.info,
+				middlewares: [new AuthMiddleware(this.userService)],
 			},
 		]);
 	}
@@ -60,5 +67,9 @@ export class UserController extends BaseController implements IUserController {
 		} else {
 			next(new HttpError(422, 'Пользователь уже зарегистрирован', 'user-register'));
 		}
+	}
+
+	async info(req: Request, res: Response, next: NextFunction): Promise<void> {
+		res.send(req.userModel);
 	}
 }
