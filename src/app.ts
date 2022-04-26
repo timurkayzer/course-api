@@ -1,4 +1,5 @@
 import express, { Express, Router } from 'express';
+import { Server } from 'http';
 import { inject, injectable } from 'inversify';
 import { IExceptionFilter } from './errors/exception.filter.interface';
 import { ILogger } from './logger/logger.interface';
@@ -13,6 +14,7 @@ import { JwtMiddleware } from './common/jwt.middleware';
 @injectable()
 export class App {
 	private app: Express;
+	server: Server;
 	private port = 4200;
 
 	constructor(
@@ -47,6 +49,12 @@ export class App {
 		this.useExceptionFilters();
 		await this.prismaService.connect();
 		this.logger.log('Сервер запущен на порту ' + this.port);
-		this.app.listen(this.port);
+		this.server = this.app.listen(this.port);
+	}
+
+	public shutdown(): void {
+		this.server.close(() => {
+			this.logger.log('Сервер завершил работу');
+		});
 	}
 }
